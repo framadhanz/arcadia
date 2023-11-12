@@ -136,7 +136,7 @@ data:
  config.yaml: | 
   Vpm:
     # CHANGE ME
-    ClusterName: framadhan-k8s-rancher-site
+    ClusterName: framadhan-k8s-rancher-jkt
     ClusterType: ce
     Config: /etc/vpm/config.yaml
     DisableModules: ["recruiter"]
@@ -170,16 +170,16 @@ spec:
         statefulset: vp-manager
     spec:
       serviceAccountName: vpm-sa
-      #affinity:
-      #  podAntiAffinity:
-      #    requiredDuringSchedulingIgnoredDuringExecution:
-      #    - labelSelector:
-      #        matchExpressions:
-      #        - key: name
-      #          operator: In
-      #          values:
-      #          - vpm
-      #      topologyKey: kubernetes.io/hostname
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: name
+                operator: In
+                values:
+                - vpm
+            topologyKey: kubernetes.io/hostname
       initContainers:
       - name : vpm-init-config
         image: busybox
