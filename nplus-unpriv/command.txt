@@ -1,0 +1,1 @@
+sudo DOCKER_BUILDKIT=1 docker build --no-cache -t fauziramadhan/nplusnap-unpriv:alpine --secret id=nginx-crt,src=nginx-repo.crt --secret id=nginx-key,src=nginx-repo.key .
