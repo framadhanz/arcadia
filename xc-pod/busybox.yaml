@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: busybox
+spec:
+  serviceName: busybox
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+        - image: busybox
+          args: [/bin/sh, -c, 'sleep 9999' ]
+          volumeMounts:
+            - mountPath: /test
+              name: busybox-pvc
+          name: busybox
+  volumeClaimTemplates:
+  - metadata:
+      name: busybox-pvc
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: arcadia-ingress
+  namespace: ves-system
+  annotations:
+    virtual-server.f5.com/partition: "kubernetes"
+    virtual-server.f5.com/ip: 10.1.10.16
+    virtual-server.f5.com/http-port: "80"
+    virtual-server.f5.com/ssl-redirect: "false"
+    virtual-server.f5.com/balance: "round-robin"
+spec:
+  rules:
+  - host: arcadia.f5demo.id      
+    http:
+      paths:
+      - backend:
+          serviceName: frontend
+          servicePort: 80

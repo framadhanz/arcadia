@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sc-nginx-default-conf-9090-fe-cm
+data:
+  default.conf: |
+
+    map $http_api_key $api_client_name {
+       default       "";
+        "JAWex+W9oHGzu8r/ISVLWUgL"  "client_one";
+       "C+krNtqBtgefj9Pa1X5xeqht"  "client_two";
+       "FIIl5UAvqwi/i6U51W674qVj"  "client_three";
+       "dhK2mnQyx5IToMlEO8IX4C0x"  "client_four";
+       "gYcnerSVsipvMuMJBSYV3eSP"  "client_five";
+    }
+    error_log /var/log/nginx/error.log debug;
+    server {
+    listen       9090;
+    #app_protect_enable on;
+
+    location / {
+        # proxy to upstream applications
+        proxy_pass http://127.0.0.1:9080;
+        proxy_set_header Host $http_host;
+
+        # don't use http 1.0 so keepalive enabled by default
+        proxy_http_version 1.1;
+
+        # prevent client from closing keepalive
+        proxy_set_header Connection "";
+
+        # don't need timeouts for process to process communication
+        # (why complicate things with this MITM proxy? let client timeout)
+        proxy_send_timeout 86400s;
+        proxy_read_timeout 86400s;
+
+        # don't write client body to docker file system
+        proxy_request_buffering off;
+    }
+
+
+    # API key validation
+    location = /_validate_api_key {
+       internal;
+
+       if ($http_api_key = "") {
+           return 401; # Unauthorized
+       }
+       if ($api_client_name = "") {
+           return 403; # Forbidden
+       }
+
+        return 204; # OK (no content)
+    }
+
+    location /api {
+       proxy_pass http://127.0.0.1:4010/api;
+       proxy_http_version 1.1;
+       proxy_set_header Connection "";
+       proxy_send_timeout 86400s;
+       proxy_read_timeout 86400s;
+       proxy_request_buffering off;
+    }
+
+    location /money-transfer/ {
+        proxy_pass http://money-transfer.arcadia.svc.cluster.local/money-transfer/;
+        #proxy_pass http://money-transfer.ves-system.svc.cluster.local/money-transfer/;
+        #proxy_pass http://10.42.1.63:9090/money-transfer/;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_send_timeout 86400s;
+        proxy_read_timeout 86400s;
+        proxy_request_buffering off;
+    }
+
+    location /refer-friends/ {
+       proxy_pass http://refer-friends.arcadia.svc.cluster.local/refer-friends/;
+       #proxy_pass http://refer-friends.xcmesh.global/$uri;
+       #proxy_pass http://refer-friends.cloud/refer-friends/;
+       #proxy_set_header Host $http_host;
+       proxy_http_version 1.1;
+       proxy_set_header Connection "";
+       proxy_send_timeout 86400s;
+       proxy_read_timeout 86400s;
+       proxy_request_buffering off;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+
+    }
