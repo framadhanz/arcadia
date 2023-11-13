@@ -1,0 +1,11 @@
+helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+
+helm repo update
+
+kubectl create namespace nfs-storage
+
+kubectl label namespace nfs-storage "kubernetes.io/cluster-monitoring=true"
+
+helm install nfs nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --set nfs.server=10.1.1.5 --set nfs.path=/var/nfs/general --set storageClass.name=managed-nfs --set storageClass.defaultClass=true --set storageClass.onDelete=delete -n nfs-storage --create-namespace
+
+
