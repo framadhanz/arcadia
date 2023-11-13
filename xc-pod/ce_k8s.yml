@@ -136,7 +136,7 @@ data:
  config.yaml: | 
   Vpm:
     # CHANGE ME
-    ClusterName: framadhan-k8s-rancher-jkt
+    ClusterName: framadhan-k8s-rancher-site-1
     ClusterType: ce
     Config: /etc/vpm/config.yaml
     DisableModules: ["recruiter"]
